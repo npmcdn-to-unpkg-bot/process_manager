@@ -5,13 +5,13 @@ Spring Boot + jBPM 6
 Slide: [Process Manager架構與規劃](https://goo.gl/FmKa7p)
 
 功能:
-- [ ] RESTful API
-- [ ] Task CRUD
-- [ ] Process Management (CRUD, run, monitor, log)
-- [ ] Task
-  - [ ] Task Web Editor
-- [ ] Process
-  - [ ] Process Service
+- RESTful API
+- Task CRUD
+- Process Management (CRUD, run, monitor, log)
+- Task
+  - Task Web Editor
+- Process
+  - Process Service
 
 
 Process Engine functions
@@ -21,7 +21,6 @@ Process Engine functions
 - log
 
 Process Engine UI
-
 
 ## jBPM Ref
 - [Using the Process Fluent API to Create Business Process](https://access.redhat.com/documentation/en-US/Red_Hat_JBoss_BPM_Suite/6.2/html/Development_Guide/sect-Process_Fluent_API.html)

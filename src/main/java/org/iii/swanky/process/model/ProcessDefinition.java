@@ -1,4 +1,4 @@
-package org.iii.swanky.process_manager.model;
+package org.iii.swanky.process.model;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import lombok.Singular;
 
 @Data
 @Builder
-public class Process {
+public class ProcessDefinition {
 	String id;
 	String name;
 	String version;

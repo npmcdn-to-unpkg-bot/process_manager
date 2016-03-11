@@ -1,27 +1,22 @@
-package org.iii.swanky.process_manager.service;
+package org.iii.swanky.process.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.iii.swanky.process_manager.ProcessManagerApp;
-import org.iii.swanky.process_manager.model.Action;
-import org.iii.swanky.process_manager.model.Connection;
-import org.iii.swanky.process_manager.model.Constraint;
-import org.iii.swanky.process_manager.model.End;
-import org.iii.swanky.process_manager.model.Join;
-import org.iii.swanky.process_manager.model.Process;
-import org.iii.swanky.process_manager.model.Split;
-import org.iii.swanky.process_manager.model.Start;
-import org.jbpm.bpmn2.xml.XmlBPMNProcessDumper;
+import org.iii.swanky.process.ProcessManagerApp;
+import org.iii.swanky.process.model.Action;
+import org.iii.swanky.process.model.Connection;
+import org.iii.swanky.process.model.Constraint;
+import org.iii.swanky.process.model.End;
+import org.iii.swanky.process.model.Join;
+import org.iii.swanky.process.model.ProcessDefinition;
+import org.iii.swanky.process.model.Split;
+import org.iii.swanky.process.model.Start;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,26 +26,31 @@ import lombok.extern.slf4j.Slf4j;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ProcessManagerApp.class)
 @Slf4j
-public class ProcessBuilderServiceTest {
+public class RuleFlowProcessBuilderTest {
 
 	@Autowired
-	ProcessBuilderService processBuilderService;
+	RuleFlowProcessBuilder builder;
+
+	@Autowired
+	ProcessEngine engine;
 
 	@Test
-	public void testCreateRuleFlowProcess() throws Exception {
-		Process process = createProcess();
+	public void testBuild() throws Exception {
+		ProcessDefinition process = createProcess();
+		// ProcessDefinition process = createProcess2();
+
 		log.info("Process toString():\n" + process.toString());
 		log.info("Process toJson():\n" + process.toJson());
-		RuleFlowProcess jbpmProcess = processBuilderService.createRuleFlowProcess(process);
+		RuleFlowProcess jbpmProcess = builder.build(process);
 		assertNotNull(jbpmProcess);
 		assertTrue(8 == jbpmProcess.getNodes().length);
 
-		runProcess(jbpmProcess);
+		engine.runProcess(jbpmProcess);
 	}
 
-	private Process createProcess() {
-		Process.ProcessBuilder builder = Process.builder().id("p_id").name("p_name").version("0.1")
-				.packageName("iii.org.swanky");
+	private ProcessDefinition createProcess() {
+		ProcessDefinition.ProcessDefinitionBuilder builder = ProcessDefinition.builder().id("p_id").name("p_name")
+				.version("1.0").packageName("iii.org.swanky");
 
 		Start start = Start.builder().id(1).name("Start").build();
 		builder.start(start);
@@ -87,21 +87,41 @@ public class ProcessBuilderServiceTest {
 		builder.end(end);
 		builder.connection(Connection.builder().from(goodbye).to(end).build());
 
-		Process process = builder.build();
+		ProcessDefinition process = builder.build();
 		return process;
 	}
 
-	private void runProcess(RuleFlowProcess process) {
-		KieServices ks = KieServices.Factory.get();
-		KieFileSystem kfs = ks.newKieFileSystem();
-		Resource resource = ks.getResources()
-				.newByteArrayResource(XmlBPMNProcessDumper.INSTANCE.dump(process).getBytes());
-		resource.setSourcePath(process.getId() + ".bpmn2");
-		kfs.write(resource);
-		ReleaseId releaseId = ks.newReleaseId(process.getName(), process.getPackageName(), process.getVersion());
-		kfs.generateAndWritePomXML(releaseId);
-		ks.newKieBuilder(kfs).buildAll();
-		ks.newKieContainer(releaseId).newKieSession().startProcess(process.getId());
+	private ProcessDefinition createProcess2() {
+		long index = 1;
+
+		ProcessDefinition.ProcessDefinitionBuilder builder = ProcessDefinition.builder().id("p_id").name("p_name")
+				.version("1.0").packageName("iii.org.swanky");
+
+		Start start = Start.builder().id(index++).name("Start").build();
+		builder.start(start);
+
+		Action hello = Action.builder().id(index++).name("Hello").dialect("java").action(printText("Hello")).build();
+		Constraint helloConstraint = Constraint.builder().toNode(hello).name("Hello_Constraint").type("code")
+				.dialect("java").constraint("return true;").build();
+		builder.action(hello);
+
+		End helloEnd = End.builder().id(index++).name("Hello_End").build();
+		End splitEnd = End.builder().id(index++).name("Split_End").build();
+		Constraint splitConstraint = Constraint.builder().toNode(splitEnd).name("Split_Constraint").type("code")
+				.dialect("java").constraint("return true;").build();
+		builder.end(helloEnd).end(splitEnd);
+
+		Split split = Split.builder().id(index++).name("Split").type("or").constraint(helloConstraint)
+				.constraint(splitConstraint).build();
+		builder.split(split);
+
+		builder.connection(Connection.builder().from(start).to(split).build());
+		builder.connection(Connection.builder().from(split).to(hello).build());
+		builder.connection(Connection.builder().from(split).to(splitEnd).build());
+		builder.connection(Connection.builder().from(hello).to(helloEnd).build());
+
+		ProcessDefinition process = builder.build();
+		return process;
 	}
 
 	String printText(String text) {

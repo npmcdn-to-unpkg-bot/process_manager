@@ -1,4 +1,4 @@
-package org.iii.swanky.process_manager.model;
+package org.iii.swanky.process.model;
 
 import java.util.ArrayList;
 import java.util.List;
