@@ -1,6 +1,5 @@
 package org.iii.swanky.process.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Builder;
@@ -13,7 +12,7 @@ public class Split implements Node {
 	long id;
 	String name;
 	String type;
-	
+
 	@Singular
-	List<Constraint> constraints = new ArrayList<Constraint>();
+	List<Constraint> constraints;
 }

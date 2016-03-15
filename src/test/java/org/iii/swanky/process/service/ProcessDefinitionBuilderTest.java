@@ -27,9 +27,19 @@ public class ProcessDefinitionBuilderTest {
 	@Autowired
 	ProcessEngine engine;
 
+	static {
+		System.setProperty("jbpm.enable.multi.con", "true");
+	}
+	
 	@Test
 	public void testBuild() throws Exception {
 		Task task = Task.builder().name("init").condition("return true;").action("System.out.println(\"Init\");")
+				.nextTask(
+						Task.builder().name("init2").condition("return true;").action("System.out.println(\"Init2\");")
+						.nextTask(Task.builder().name("init3").condition("return true;").action("System.out.println(\"Init3\");").build())
+						.build())
+				.nextTask(
+						Task.builder().name("init4").condition("return true;").action("System.out.println(\"Init4\");").build())
 				.build();
 		ProcessDefinition def = builder.build(task);
 		assertNotNull(def);

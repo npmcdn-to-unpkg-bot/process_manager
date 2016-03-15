@@ -1,5 +1,7 @@
 package org.iii.swanky.process.service;
 
+import java.util.List;
+
 import org.iii.swanky.process.model.Action;
 import org.iii.swanky.process.model.Connection;
 import org.iii.swanky.process.model.Constraint;
@@ -23,13 +25,14 @@ public class ProcessDefinitionBuilder {
 	@Builder
 	private static class Param {
 		ProcessDefinition.ProcessDefinitionBuilder builder;
-		long index;
 		Task task;
 		Node prev;
 	}
 
-	public ProcessDefinition build(Task task) {
-		long index = 1;
+	long index;
+
+	public synchronized ProcessDefinition build(Task task) {
+		index = 1;
 		String id = "ID_" + task.getName();
 		String name = "NAME_" + task.getName();
 		String packageName = "iii.org.swanky";
@@ -41,26 +44,26 @@ public class ProcessDefinitionBuilder {
 		Start start = Start.builder().id(index++).name("Start_" + task.getName()).build();
 		builder.start(start);
 
-		Param param = Param.builder().builder(builder).index(index).task(task).prev(start).build();
+		Param param = Param.builder().builder(builder).task(task).prev(start).build();
 		handleTask(param);
 
 		return builder.build();
 	}
 
 	// for each task: 1 action + 1 or 2 end(if no next task) + 1 split
-	private void handleTask(Param param) {
+	private Node handleTask(Param param) {
 		// set task.action
-		Action action = Action.builder().id(param.index++).name("Action_" + param.task.getName()).dialect("java")
+		Action action = Action.builder().id(index++).name("Action_" + param.task.getName()).dialect("java")
 				.action(param.task.getAction()).build();
 		// set task.condition
 		Constraint actionConstraint = Constraint.builder().toNode(action).name("Constraint_" + action.getName())
 				.type("code").dialect("java").constraint(param.task.getCondition()).build();
 
-		End splitEnd = End.builder().id(param.index++).name("End_" + param.task.getName()).build();
+		End splitEnd = End.builder().id(index++).name("End_" + param.task.getName()).build();
 		Constraint splitConstraint = Constraint.builder().toNode(splitEnd).name("Split_End_Constraint").type("code")
 				.dialect("java").constraint("return true;").build();
 
-		Split s = Split.builder().id(param.index++).name("Split_" + param.task.getName()).type("or")
+		Split s = Split.builder().id(index++).name("Split_" + param.task.getName()).type("or")
 				.constraint(actionConstraint).constraint(splitConstraint).build();
 
 		Connection prev_s = Connection.builder().from(param.prev).to(s).build();
@@ -68,16 +71,17 @@ public class ProcessDefinitionBuilder {
 		Connection s_e = Connection.builder().from(s).to(splitEnd).build();
 		param.builder.action(action).end(splitEnd).split(s).connection(prev_s).connection(s_a).connection(s_e);
 
-		if (param.task.getNextTasks().isEmpty()) {
-			End aEnd = End.builder().id(param.index++).name("End_" + action.getName()).build();
+		List<Task> nextTasks = param.task.getNextTasks();
+		if (nextTasks.isEmpty()) {
+			End aEnd = End.builder().id(index++).name("End_" + action.getName()).build();
 			Connection a_aEnd = Connection.builder().from(action).to(aEnd).build();
 			param.builder.end(aEnd).connection(a_aEnd);
 		} else {
-			for (Task nextTask : param.task.getNextTasks()) {
-				Param newParam = Param.builder().builder(param.builder).index(param.index).task(nextTask).prev(action)
-						.build();
+			for (Task nextTask : nextTasks) {
+				Param newParam = Param.builder().builder(param.builder).task(nextTask).prev(action).build();
 				handleTask(newParam);
 			}
 		}
+		return action;
 	}
 }
