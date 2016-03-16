@@ -1,5 +1,6 @@
 package org.iii.swanky.task.model;
 
+import org.iii.swanky.task.model.custom.MailTask;
 import org.junit.Test;
 
 public class TaskTest {

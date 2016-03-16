@@ -1,9 +1,8 @@
-package org.iii.swanky.task.model;
+package org.iii.swanky.task.model.custom;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.iii.swanky.task.model.Task.TaskBuilder;
+import org.iii.swanky.task.model.Task;
 
 import lombok.Builder;
 import lombok.Data;

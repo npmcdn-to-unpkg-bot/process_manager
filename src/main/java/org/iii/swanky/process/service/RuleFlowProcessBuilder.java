@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+//TODO 自動產生unique id, Node不需要設定id
 @Service
 @Slf4j
 public class RuleFlowProcessBuilder {
