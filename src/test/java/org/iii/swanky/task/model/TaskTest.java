@@ -10,5 +10,9 @@ public class TaskTest {
 				.build();
 
 		System.out.println(task);
+
+		Task mailTask = MailTask.builder().name("mail").condition("notify == true").mail("swanky@insnergy.com").build()
+				.toTask();
+		System.out.println(mailTask);
 	}
 }

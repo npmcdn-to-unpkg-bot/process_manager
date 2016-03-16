@@ -21,6 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProcessDefinitionBuilder {
 
+	static {
+		System.setProperty("jbpm.enable.multi.con", "true");
+	}
+
 	@Data
 	@Builder
 	private static class Param {
@@ -50,6 +54,8 @@ public class ProcessDefinitionBuilder {
 		return builder.build();
 	}
 
+	//TODO 設定"jbpm.enable.multi.con"後，是否不需要split?
+	
 	// for each task: 1 action + 1 or 2 end(if no next task) + 1 split
 	private Node handleTask(Param param) {
 		// set task.action
