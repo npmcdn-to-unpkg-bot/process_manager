@@ -54,8 +54,8 @@ public class ProcessDefinitionBuilder {
 		return builder.build();
 	}
 
-	//TODO 設定"jbpm.enable.multi.con"後，是否不需要split?
-	
+	// TODO 設定"jbpm.enable.multi.con"後，是否不需要split?
+
 	// for each task: 1 action + 1 or 2 end(if no next task) + 1 split
 	private Node handleTask(Param param) {
 		// set task.action
@@ -78,7 +78,7 @@ public class ProcessDefinitionBuilder {
 		param.builder.action(action).end(splitEnd).split(s).connection(prev_s).connection(s_a).connection(s_e);
 
 		List<Task> nextTasks = param.task.getNextTasks();
-		if (nextTasks.isEmpty()) {
+		if ((nextTasks == null) || (nextTasks.isEmpty())) {
 			End aEnd = End.builder().id(index++).name("End_" + action.getName()).build();
 			Connection a_aEnd = Connection.builder().from(action).to(aEnd).build();
 			param.builder.end(aEnd).connection(a_aEnd);
