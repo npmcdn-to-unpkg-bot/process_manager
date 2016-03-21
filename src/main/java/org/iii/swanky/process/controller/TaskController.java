@@ -1,10 +1,12 @@
-package org.iii.swanky.process;
+package org.iii.swanky.process.controller;
 
+import org.iii.swanky.process.controller.form.TaskForm;
 import org.iii.swanky.process.model.ProcessDefinition;
 import org.iii.swanky.process.service.ProcessDefinitionBuilder;
 import org.iii.swanky.process.service.ProcessEngine;
 import org.iii.swanky.process.service.RuleFlowProcessBuilder;
 import org.iii.swanky.task.model.Task;
+import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,20 +27,31 @@ public class TaskController {
 
 	@Autowired
 	ProcessEngine engine;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String newTask() {
 		return "new_task";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String addTask(Task task, Model model) {
-		ProcessDefinition def = builder.build(task);
+	public String addTask(TaskForm form, Model model) {
+		
+		Task.TaskBuilder taskBuilder = Task.builder()
+				.name(form.getName())
+				.condition(form.getCondition())
+				.action(form.getAction());
+		
+		ProcessDefinition def = builder.build(taskBuilder.build());
 
 		log.info(def.toJson());
 
-		engine.runProcess(ruleFlowbuilder.build(def));
-		
+		RuleFlowProcessInstance instance = engine.runProcess(ruleFlowbuilder.build(def));
+		String output = (String)instance.getVariable("output");
+		if (output != null) {
+			log.info("Output: " + output.toString());
+			model.addAttribute("output", output);
+		}
+
 		return "new_task";
 	}
 }

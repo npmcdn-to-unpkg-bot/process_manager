@@ -1,47 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Task</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
 
-<title>New Task</title>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
-
-<!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
-</head>
-
-<body>
-  <div class="container">
-
-    <h1>Add Task</h1>
-    <form method="POST">
-
-      <div class="form-group">
-        <label for="name">Name:</label> <input type="text" class="form-control" name="name" value="DEMO" />
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+      <h1>New Task</h1>
+      <form method="POST">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" name="name" value="DEMO" />
+        </div>
+        <div class="form-group">
+          <label for="condition">Condition</label>
+          <div class="well">
+            <div id="conditionTypeRadio">
+              <label class="radio-inline">
+              <input type="radio" name="conditionType" id="conditionType-code" value="code" checked="checked" />
+              code
+              </label>
+              <label class="radio-inline">
+              <input type="radio" name="conditionType" id="conditionType-rule" value="rule" />
+              rule
+              </label>
+            </div>
+            <div id="conditionDialectRadio">
+              <label class="radio-inline">
+              <input type="radio" name="conditionDialect" id="conditionDialect-java" value="java" checked="checked" />
+              java
+              </label>
+              <label class="radio-inline">
+              <input type="radio" name="conditionDialect" id="conditionDialect-mvel" value="mvel" />
+              mvel
+              </label>
+            </div>
+            <textarea class="form-control" name="condition" rows="3">return true;</textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="action">Action</label>
+          <div class="well">
+            <div id="actionTypeRadio">
+              <label class="radio-inline">
+              <input type="radio" name="actionType" id="actionType-java" value="java" checked="checked" />
+              java
+              </label>
+              <label class="radio-inline">
+              <input type="radio" name="actionType" id="actionType-mvel" value="mvel" />
+              mvel
+              </label>
+            </div>
+            <textarea class="form-control" rows="3" name="action">kcontext.setVariable("output", "Hello");</textarea>
+          </div>
+        </div>
+        
+          <p>
+            <a href="#" id="btnAdd" class="btn btn-info">Add Next Task</a>
+          </p>
+          <ul class="nav nav-tabs" id="tabs"></ul>
+          <div class="tab-content"></div>
+        
+        <button type="submit" class="btn btn-info">Submit</button>
+      </form>
+      
+      <div th:if="${output != null}">
+        <hr />
+        <div class="alert alert-success">
+          <strong>Output:</strong> <span th:text="${output}" />
+        </div>
       </div>
+    </div>
+    <!-- /.container -->
 
-      <div class="form-group">
-        <label for="condition">Condition:</label>
-        <textarea class="form-control" name="condition" rows="3">return true;</textarea>
-      </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" />
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" />
+    
+    <script>
+    $('#btnAdd').click(
+        function(e) {
+          var nextTab = $('#tabs li').size() + 1;
 
-      <div class="form-group">
-        <label for="action">Action:</label>
-        <textarea class="form-control" rows="3" name="action">System.out.println("Hello");</textarea>
-      </div>
+          // create the tab
+          $('<li><a href="#tab' + nextTab + '" data-toggle="tab">Next Task ' + nextTab + '</a></li>').appendTo('#tabs');
 
-      <button type="submit" class="btn btn-info">Submit</button>
-    </form>
-  </div>
-
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-</body>
+          // create the tab content
+          var taskTab = $("<div/>", 
+                 { class: 'tab-pane',
+                   id: 'tab' + nextTab}
+          );
+          
+          taskTab.append(
+              $("<div/>", { class:'form-group' })
+              .append($("<label/>", { for: 'name_next_' + nextTab }).html('Name'))
+              .append($("<input/>", { type: 'text', class: 'form-control', name: 'name_next_' + nextTab, value: 'DEMO_' + nextTab }))
+          );
+          
+          taskTab.append(
+              $("<div/>", { class:'form-group' })
+              .append($("<label/>", { for: 'condition_next_' + nextTab }).html('Condition'))
+              .append($("<div/>", { class: 'well' })
+                      .append($("<textarea/>", { class: 'form-control', name: 'condition_next_' + nextTab, row: '3' }).html('return true;'))
+              )
+          );
+          
+          taskTab.append(
+              $("<div/>", { class:'form-group' })
+              .append($("<label/>", { for: 'action_next_' + nextTab }).html('Action'))
+              .append($("<div/>", { class: 'well' })
+                      .append($("<textarea/>", { class: 'form-control', name: 'action_next_' + nextTab, row: '3' }).html('kcontext.setVariable("output", "Hello");'))
+              )
+          );
+          
+          taskTab.appendTo('.tab-content');
+          
+          // make the new tab active
+          $('#tabs a:last').tab('show');
+        });
+    </script>
+    
+  </body>
 </html>
