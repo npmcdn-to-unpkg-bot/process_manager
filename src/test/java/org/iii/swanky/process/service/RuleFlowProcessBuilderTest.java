@@ -15,6 +15,7 @@ import org.iii.swanky.process.model.ProcessDefinition;
 import org.iii.swanky.process.model.Split;
 import org.iii.swanky.process.model.Start;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
+import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,8 @@ public class RuleFlowProcessBuilderTest {
 		assertNotNull(jbpmProcess);
 		assertTrue(8 == jbpmProcess.getNodes().length);
 
-		engine.runProcess(jbpmProcess);
+		engine.addProcess(jbpmProcess);
+		RuleFlowProcessInstance instance = engine.startProcess(process.getId());
 	}
 
 	private ProcessDefinition createProcess() {

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import org.iii.swanky.process.ProcessManagerApp;
 import org.iii.swanky.process.model.ProcessDefinition;
 import org.iii.swanky.task.model.Task;
+import org.jbpm.ruleflow.core.RuleFlowProcess;
+import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ public class ProcessDefinitionBuilderTest {
 
 		log.info(def.toJson());
 
-		engine.runProcess(ruleFlowbuilder.build(def));
+		RuleFlowProcess process = ruleFlowbuilder.build(def);
+		engine.addProcess(process);
+		RuleFlowProcessInstance instance = engine.startProcess(process.getId());
 	}
 }

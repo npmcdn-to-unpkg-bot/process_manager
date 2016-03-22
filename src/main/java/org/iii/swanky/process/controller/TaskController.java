@@ -6,6 +6,7 @@ import org.iii.swanky.process.service.ProcessDefinitionBuilder;
 import org.iii.swanky.process.service.ProcessEngine;
 import org.iii.swanky.process.service.RuleFlowProcessBuilder;
 import org.iii.swanky.task.model.Task;
+import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,18 +36,18 @@ public class TaskController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public String addTask(TaskForm form, Model model) {
-		
-		Task.TaskBuilder taskBuilder = Task.builder()
-				.name(form.getName())
-				.condition(form.getCondition())
+
+		Task.TaskBuilder taskBuilder = Task.builder().name(form.getName()).condition(form.getCondition())
 				.action(form.getAction());
-		
+
 		ProcessDefinition def = builder.build(taskBuilder.build());
 
 		log.info(def.toJson());
 
-		RuleFlowProcessInstance instance = engine.runProcess(ruleFlowbuilder.build(def));
-		String output = (String)instance.getVariable("output");
+		RuleFlowProcess process = ruleFlowbuilder.build(def);
+		engine.addProcess(process);
+		RuleFlowProcessInstance instance = engine.startProcess(process.getId());
+		String output = (String) instance.getVariable("output");
 		if (output != null) {
 			log.info("Output: " + output.toString());
 			model.addAttribute("output", output);

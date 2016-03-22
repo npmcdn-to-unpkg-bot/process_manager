@@ -1,5 +1,8 @@
 package org.iii.swanky.process.service;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.jbpm.bpmn2.xml.XmlBPMNProcessDumper;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
@@ -7,6 +10,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.Resource;
+import org.kie.api.runtime.KieSession;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class ProcessEngine {
-	public RuleFlowProcessInstance runProcess(RuleFlowProcess process) {
+	Map<String, KieSession> kieSessionMap = new LinkedHashMap<String, KieSession>();
+
+	public void addProcess(RuleFlowProcess process) {
 		String id = process.getId();
 		String name = process.getName();
 		String packageName = process.getPackageName();
@@ -39,7 +45,11 @@ public class ProcessEngine {
 		kfs.generateAndWritePomXML(releaseId);
 		ks.newKieBuilder(kfs).buildAll();
 
-		// create KieContainer -> KieSession -> start
-		return (RuleFlowProcessInstance) ks.newKieContainer(releaseId).newKieSession().startProcess(id);
+		// create KieContainer -> KieSession
+		kieSessionMap.put(id, ks.newKieContainer(releaseId).newKieSession());
+	}
+
+	public RuleFlowProcessInstance startProcess(String id) {
+		return (RuleFlowProcessInstance) kieSessionMap.get(id).startProcess(id);
 	}
 }
