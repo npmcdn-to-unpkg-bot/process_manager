@@ -2,7 +2,6 @@ package org.iii.swanky.process.service;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.iii.swanky.process.ProcessManagerApp;
 import org.iii.swanky.process.model.ProcessDefinition;
 import org.iii.swanky.task.model.Task;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
@@ -10,13 +9,13 @@ import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.extern.slf4j.Slf4j;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(ProcessManagerApp.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 @Slf4j
 public class ProcessDefinitionBuilderTest {
 

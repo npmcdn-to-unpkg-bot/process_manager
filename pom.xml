@@ -9,13 +9,13 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jbpm.version>6.3.0.Final</jbpm.version>
+		<jbpm.version>6.4.0.Final</jbpm.version>
 	</properties>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.3.3.RELEASE</version>
+		<version>1.4.0.M3</version>
 		<relativePath />
 	</parent>
 
@@ -87,7 +87,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.8</version>
 		</dependency>
 
 	</dependencies>

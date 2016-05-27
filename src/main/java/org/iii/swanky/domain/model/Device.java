@@ -7,5 +7,4 @@ import lombok.Data;
 @Builder
 public class Device {
 	String id;
-	double kw;
 }
