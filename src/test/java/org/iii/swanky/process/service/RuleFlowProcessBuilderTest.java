@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
-import org.iii.swanky.process.ProcessManagerApp;
 import org.iii.swanky.process.model.Action;
 import org.iii.swanky.process.model.Connection;
 import org.iii.swanky.process.model.Constraint;
@@ -19,9 +18,7 @@ import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.extern.slf4j.Slf4j;
